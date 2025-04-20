@@ -18,6 +18,9 @@ sig
 
   val assert: bool -> unit
 
+  val raises: (exn -> bool) -> test -> unit
+  val raisesAny: test -> unit
+
   (*!
    * Turn a list of results
    *)
@@ -35,6 +38,15 @@ struct
 
   fun assert true = ()
     | assert false = raise Assert
+
+  fun raises cond f =
+    let
+      val raised = (f (); false) handle e => cond e
+    in
+      assert raised
+    end
+
+  val raisesAny = raises (fn _ => true)
 
   type test = unit -> unit
   type result = (exn * string) option
