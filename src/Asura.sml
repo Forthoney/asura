@@ -10,19 +10,13 @@ sig
   type summary
 
   (*!
-   * An assertion in the form of an exception
-   * If a test's success is determined by some condition, use `raise Assert cond` at the end of the test
-   * 
-   * Tests that raise an `Assert true` will be considered a _success_
-   *)
-  exception Assert of bool
-
-  (*!
    * Run a test.
    * Returns a function name if the function failed, otherwise NONE
    * All exceptions thrown by the test must be caught and handled here
    *)
   val run: test -> result
+
+  val assert: bool -> unit
 
   (*!
    * Turn a list of results
@@ -37,7 +31,10 @@ sig
   val printSummary: test list -> unit
 end =
 struct
-  exception Assert of bool
+  exception Assert
+
+  fun assert true = ()
+    | assert false = raise Assert
 
   type test = unit -> unit
   type result = (exn * string) option
@@ -55,10 +52,8 @@ struct
         | _ => NONE
 
       fun bugNotice func =
-        if String.isSuffix "AsuraFn.assert" func then
-          "<mlton bug...can't track>"
-        else
-          func
+        if String.isSuffix "AsuraFn.assert" func then "<stack frame missing>"
+        else func
 
       val rec loop =
         fn [] | [_] => NONE
@@ -78,16 +73,14 @@ struct
 
   fun run test =
     (test (); NONE)
-    handle
-      Assert true => NONE
-    | e => 
-        let
-          val traces = MLton.Exn.history e
-        in
-          case findSource traces of
-            SOME src => SOME (e, src)
-          | NONE => raise Trace traces
-        end
+    handle e =>
+      let
+        val traces = MLton.Exn.history e
+      in
+        case findSource traces of
+          SOME src => SOME (e, src)
+        | NONE => raise Trace traces
+      end
 
   fun summarize tests =
     {total = length tests, failed = map #2 (List.mapPartial run tests)}
