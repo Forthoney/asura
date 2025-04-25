@@ -3,7 +3,7 @@ functor CustomAutoRunner(structure F: FORMATTER
 struct
   val _ =
     let
-      val run = Option.compose (fn res => (print (F.fmt res); res), Runner.run)
+      val run = Option.compose (fn res => (print (F.fmt res ^ "\n"); res), Runner.run)
       val results = List.mapPartial run S.tests
     in
       print (F.summarize results ^ "\n")
