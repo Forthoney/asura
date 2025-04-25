@@ -6,14 +6,16 @@ end
 
 structure PlainFmt: FORMATTER =
 struct
+  fun quote s = "\"" ^ s ^ "\""
+  
   fun fmt (Assert.Assert, source) =
     "Assertion failed at " ^ source
     | fmt (Assert.NEq (a, b), source) =
-      "Expected '" ^ a ^ "' but found '" ^ b ^ "' at " ^ source
+      "Expected " ^ quote a ^ " but found " ^ quote b ^ " at " ^ source
     | fmt (Assert.NEmpty s, source) =
-      "Expected empty item but found '" ^ s ^ "' at " ^ source
+      "Expected empty item but found " ^ quote s ^ " at " ^ source
     | fmt (e, source) =
-      "Unexpected exception '" ^ exnName e ^ "' raised at " ^ source
+      "Unexpected exception " ^ quote (exnName e) ^ " raised at " ^ source
 
   fun summarize results =
     let
