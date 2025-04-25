@@ -4,6 +4,16 @@ $(SML_LIB)/basis/mlton.mlb
 ann
 	"allowOrPats true"
 in
-	ErrorFormatter.sml
-	Asura.sml
+	local
+		Assert.sml
+		Runner.sml
+		Formatter.sml
+		AutoRunner.fun
+	in
+		Asura.sml
+		signature ASURA_SUITE = SUITE
+		signature ASURA_FORMATTER = FORMATTER
+		functor AsuraAutoRunner = AutoRunner
+		functor AsuraCustomAutoRunner = CustomAutoRunner
+	end
 end

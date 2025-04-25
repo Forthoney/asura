@@ -1,8 +1,11 @@
-open Asura
+val assert = Asura.Assert.assert
+val run = Asura.Runner.run
 
 fun triviallyTrue () = assert true
 
 fun triviallyFalse () = assert false
+
+fun wrapOverTriviallyFalse () = triviallyFalse ()
 
 fun arithmetic () =
   assert (1 + 1 = 2)
@@ -37,10 +40,10 @@ fun badCheck (test, name) =
      SOME (_, v) =>
        if v <> name then (print (v ^ " neq " ^ name ^ "\n"); false) else true
    | NONE => (print (name ^ " failed\n"); false))
-  handle (Trace traces) =>
+  handle (Asura.Runner.Trace traces) =>
     ( print
         (String.concatWith "\n"
-           (name ^ " failed with the following traces" :: traces) ^ "\n")
+           ("==="::(name ^ " failed with the following traces") :: traces @ ["==="]) ^ "\n")
     ; false
     )
 
@@ -55,9 +58,11 @@ fun plain () =
     val bad =
       List.map badCheck
         [ (triviallyFalse, "triviallyFalse")
+        , (wrapOverTriviallyFalse, "wrapOverTriviallyFalse")
         , (arithmeticWrong, "arithmeticWrong")
         , (raising, "raising")
         , (unwrap, "unwrap")
+        , (fn () => assert false, "<anonymous>")
         ]
 
     val _ = print (List.foldl (fn ((_, s), acc) => s ^ "\n" ^ acc) "" good)
