@@ -9,18 +9,19 @@ struct
   fun assert true = ()
     | assert false = raise Assert
 
-  fun eq (expected, actual) =
+  fun eq expected actual =
     if expected = actual then () else raise Assert
-  fun eq' toString (expected, actual) =
+
+  fun eq' toString expected actual =
     if expected = actual then ()
     else raise NEq (toString expected, toString actual)
 
   val eqInt = eq' Int.toString
   val eqStr = eq' String.toString
-  fun eqSubstr (a, b) =
-    eqStr (Substring.string a, Substring.string b)
+  fun eqSubstr a b =
+    eqStr (Substring.string a) (Substring.string b)
   fun eqSubstr' (a, b) =
-    eqStr (a, Substring.string b)
+    eqStr a (Substring.string b)
 
   fun isEmptyStr s =
     if String.size s = 0 then
@@ -36,13 +37,13 @@ struct
 
   structure List =
   struct
-    fun isEqLength (a, b) = eqInt (length a, length b)
+    fun isEqLength a b = eqInt (length a) (length b)
 
-    fun eq (expected, actual) =
+    fun eq expected actual =
       if ListPair.allEq op= (expected, actual) then ()
       else raise Assert
   
-    fun eq' toString (expected, actual) =
+    fun eq' toString expected actual =
       let
         fun listFmt toString xs =
           "[" ^ String.concatWith ", " (map toString xs) ^ "]"
@@ -53,8 +54,8 @@ struct
 
     val eqInt = eq' Int.toString
     val eqStr = eq' String.toString
-    fun eqSubstr (a, b) = eqStr (map Substring.string a, map Substring.string b)
-    fun eqSubstr' (a, b) = eqStr (map Substring.string a, map Substring.string b)
+    fun eqSubstr a b = eqStr (map Substring.string a) (map Substring.string b)
+    fun eqSubstr' a b = eqStr (map Substring.string a) (map Substring.string b)
   end
 
 
