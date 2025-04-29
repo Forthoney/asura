@@ -20,7 +20,7 @@ struct
   val eqStr = eq' String.toString
   fun eqSubstr a b =
     eqStr (Substring.string a) (Substring.string b)
-  fun eqSubstr' (a, b) =
+  fun eqSubstr' a b =
     eqStr a (Substring.string b)
 
   fun isEmptyStr s =
